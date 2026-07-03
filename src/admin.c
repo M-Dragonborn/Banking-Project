@@ -169,6 +169,21 @@ static void view_statistics(void) {
     printf("Global Loan Feature: %s\n", get_system_loan_status() ? "ENABLED" : "DISABLED");
 }
 
+static void change_admin_password(void) {
+    char new_pwd[50];
+    if (get_string("Enter new admin password: ", new_pwd, sizeof(new_pwd))) {
+        if (strlen(new_pwd) == 0) {
+            printf("Password cannot be empty.\n");
+            return;
+        }
+        if (ask_confirm("Are you sure you want to change the admin password?")) {
+            set_admin_password_hash(new_pwd);
+            printf("Admin password successfully changed.\n");
+            log_admin("Admin: changed master password");
+        }
+    }
+}
+
 void admin_menu(void) {
     int choice;
     do {
@@ -182,6 +197,7 @@ void admin_menu(void) {
             printf("4) Enable / Disable global loan feature\n");
             printf("5) View system statistics\n");
             printf("6) Search accounts\n");
+            printf("7) Change admin password\n");
         }
         printf("0) Help / Back\n");
         
@@ -225,6 +241,7 @@ void admin_menu(void) {
             }
             case 5: view_statistics(); break;
             case 6: search_accounts(); break;
+            case 7: change_admin_password(); break;
             case 0: return;
             default: printf("Invalid option.\n");
         }
