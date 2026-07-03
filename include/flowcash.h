@@ -10,27 +10,27 @@
 
 /* Data Models */
 typedef struct {
-    char   id[8];          // 7-digit account number (string)
+    char   id[8];
     char   name[50];
-    char   pin[10];        // 4-digit PIN
+    char   pin[10];
     double balance;
-    int    loan_count;     // 0-2
-    int    loan_enabled;   // 0 = disabled, 1 = enabled (global toggle)
+    int    loan_count;
+    int    loan_enabled;
 } Account;
 
 typedef struct {
-    char   date[12];       // DD/MM/YYYY (plain text, no timestamp needed)
-    char   type[12];       // DEPOSIT, WITHDRAW, TRANSFER, LOAN, PAYMENT
+    char   date[22];
+    char   type[12];
     double amount;
     char   note[80];
 } Transaction;
 
 typedef struct {
     double principal;
-    double rate;          // annual interest rate (e.g. 0.05 for 5%)
-    int    months;        // total months for repayment
-    int    paid_months;   // months already paid
-    int    missed;        // 0 = ok, 1 = missed payment
+    double rate;
+    int    months;
+    int    paid_months;
+    int    missed;
 } Loan;
 
 /* Validation Macros */
@@ -57,6 +57,7 @@ int get_double(const char *prompt, double *val);
 int get_int(const char *prompt, int *val);
 int ask_confirm(const char *prompt);
 char* get_current_date(void);
+void clear_screen(void);
 int get_admin_password_hash(char *hash_out);
 void set_admin_password_hash(const char *hash);
 
@@ -75,4 +76,4 @@ void approve_deny_loans(void);
 /* demo.c */
 void run_demo(void);
 
-#endif // FLOWCASH_H
+#endif

@@ -3,13 +3,11 @@
 void run_demo(void) {
     printf("=== RUNNING DEMO SCENARIO ===\n\n");
     
-    // Clear everything for a clean demo
     remove("data/bank_data/index.idx");
     remove("data/bank_data/user.log");
     remove("data/bank_data/admin.log");
-    set_system_loan_status(1); // Enable loans
+    set_system_loan_status(1);
     
-    // Setup ID generator
     FILE *f = fopen("data/bank_data/system.cfg", "w");
     if(f) {
         fprintf(f, "9999999\n1\n");
@@ -50,7 +48,7 @@ void run_demo(void) {
     sprintf(loan_file3, "data/bank_data/loans/%s.loan", acc3.id);
     FILE *lf3 = fopen(loan_file3, "w");
     if(lf3) {
-        fprintf(lf3, "1000.00 0.050 12 5 0\n"); // 1000 principal, 5% rate, 12 months, 5 paid, 0 missed
+        fprintf(lf3, "1000.00 0.050 12 5 0\n");
         fclose(lf3);
     }
     
@@ -68,13 +66,12 @@ void run_demo(void) {
     sprintf(loan_file4, "data/bank_data/loans/%s.loan", acc4.id);
     FILE *lf4 = fopen(loan_file4, "w");
     if(lf4) {
-        fprintf(lf4, "2000.00 0.050 24 10 1\n"); // 2000 principal, 5% rate, 24 months, 10 paid, 1 missed
+        fprintf(lf4, "2000.00 0.050 24 10 1\n");
         fclose(lf4);
     }
     
     printf("1. Created accounts: %s, %s, %s, and %s\n", acc1.name, acc2.name, acc3.name, acc4.name);
     
-    // Deposit 100 to first
     acc1.balance += 100.0;
     write_account(&acc1);
     log_transaction(acc1.id, "DEPOSIT", 100.0, "Demo deposit");
@@ -83,7 +80,6 @@ void run_demo(void) {
     log_user(msg);
     printf("2. Deposited BDT 100.00 to %s\n", acc1.name);
     
-    // Transfer 25 to second
     acc1.balance -= 25.0;
     acc2.balance += 25.0;
     write_account(&acc1);
@@ -94,12 +90,10 @@ void run_demo(void) {
     log_user(msg);
     printf("3. Transferred BDT 25.00 from %s to %s\n", acc1.name, acc2.name);
     
-    // Print balances
     printf("4. Balances:\n");
     printf("   %s: BDT %.2lf\n", acc1.name, acc1.balance);
     printf("   %s: BDT %.2lf\n", acc2.name, acc2.balance);
     
-    // Show logs
     printf("\n5. Log Files:\n");
     printf("--- user.log ---\n");
     f = fopen("data/bank_data/user.log", "r");

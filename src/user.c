@@ -26,7 +26,7 @@ void create_account(void) {
     strcpy(new_acc.pin, pin);
     new_acc.balance = initial_deposit;
     new_acc.loan_count = 0;
-    new_acc.loan_enabled = 1; // By default enabled
+    new_acc.loan_enabled = 1;
     
     if (write_account(&new_acc)) {
         add_to_index(new_acc.id);
@@ -47,7 +47,7 @@ void create_account(void) {
 void login_user(void) {
     if (is_logged_in) {
         printf("Already logged in as %s.\n", current_user.id);
-        is_logged_in = 0; // act as logout toggle from menu
+        is_logged_in = 0;
         printf("Logged out.\n");
         return;
     }
@@ -197,7 +197,7 @@ void user_menu(void) {
         }
         
         switch (choice) {
-            case 2: login_user(); break; // doubles as logout
+            case 2: login_user(); break;
             case 3: printf("Current Balance: BDT %.2lf\n", current_user.balance); break;
             case 4: user_withdraw(); break;
             case 5: user_deposit(); break;

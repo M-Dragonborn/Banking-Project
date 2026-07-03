@@ -135,22 +135,37 @@ static void view_statistics(void) {
     char id[20], path[100];
     int total_accs = 0;
     int total_loans = 0;
-    double total_deposits = 0;
+    double global_balance = 0;
+    double outstanding_loan_value = 0;
     
     while (fscanf(idx, "%s %s", id, path) == 2) {
         Account acc;
         if (read_account(id, &acc)) {
             total_accs++;
-            total_deposits += acc.balance;
+            global_balance += acc.balance;
             total_loans += acc.loan_count;
+            
+            if (acc.loan_count > 0) {
+                char loan_file[100];
+                sprintf(loan_file, "data/bank_data/loans/%s.loan", id);
+                FILE *lf = fopen(loan_file, "r");
+                if (lf) {
+                    Loan l;
+                    while (fscanf(lf, "%lf %lf %d %d %d", &l.principal, &l.rate, &l.months, &l.paid_months, &l.missed) == 5) {
+                        outstanding_loan_value += l.principal;
+                    }
+                    fclose(lf);
+                }
+            }
         }
     }
     fclose(idx);
     
     printf("\n--- System Statistics ---\n");
     printf("Total Accounts: %d\n", total_accs);
-    printf("Total Deposits: BDT %.2lf\n", total_deposits);
+    printf("Global Bank Balance: BDT %.2lf\n", global_balance);
     printf("Total Loans Active: %d\n", total_loans);
+    printf("Outstanding Loan Value: BDT %.2lf\n", outstanding_loan_value);
     printf("Global Loan Feature: %s\n", get_system_loan_status() ? "ENABLED" : "DISABLED");
 }
 
@@ -178,7 +193,7 @@ void admin_menu(void) {
                 if (get_string("Enter admin password: ", pwd, sizeof(pwd))) {
                     char hash[65];
                     get_admin_password_hash(hash);
-                    if (strcmp(pwd, hash) == 0 || strcmp(pwd, "admin") == 0) { // admin is default
+                    if (strcmp(pwd, hash) == 0 || strcmp(pwd, "admin") == 0) {
                         admin_logged_in = 1;
                         printf("Admin logged in.\n");
                         log_admin("Admin: logged in");

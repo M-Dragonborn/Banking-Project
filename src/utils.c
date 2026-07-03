@@ -103,7 +103,6 @@ int get_next_account_id(char *out_id) {
     }
     sprintf(out_id, "%07d", next_id);
     
-    // Save next (decrement to create unique IDs)
     f = fopen("data/bank_data/system.cfg", "w");
     if(f) {
         fprintf(f, "%d\n", next_id - 1);
@@ -113,7 +112,7 @@ int get_next_account_id(char *out_id) {
 }
 
 int get_system_loan_status(void) {
-    int status = 1; // Default enabled
+    int status = 1;
     FILE *f = fopen("data/bank_data/system.cfg", "r");
     if(f) {
         int dummy;
@@ -148,7 +147,7 @@ int get_admin_password_hash(char *hash_out) {
         }
         fclose(f);
     }
-    strcpy(hash_out, "admin"); // Default fallback
+    strcpy(hash_out, "admin");
     return 0;
 }
 
@@ -168,7 +167,7 @@ void clear_input_buffer(void) {
 int get_string(const char *prompt, char *buffer, int max_len) {
     printf("%s", prompt);
     if (!fgets(buffer, max_len, stdin)) return 0;
-    buffer[strcspn(buffer, "\n")] = 0; // remove newline
+    buffer[strcspn(buffer, "\n")] = 0;
     return 1;
 }
 
@@ -197,10 +196,18 @@ int ask_confirm(const char *prompt) {
     return 0;
 }
 
+void clear_screen(void) {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
 char* get_current_date(void) {
-    static char date[12];
+    static char date[22];
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
-    sprintf(date, "%02d/%02d/%04d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+    sprintf(date, "%04d-%02d-%02d %02d:%02d:%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
     return date;
 }

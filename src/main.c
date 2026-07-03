@@ -1,9 +1,6 @@
 #include "../include/flowcash.h"
 
 static void init_directories(void) {
-    // A simple hack to ensure files can be created if directories are missing
-    // In actual C we'd use mkdir, but the setup script/Makefile handles it for us.
-    // Ensure admin.cfg exists
     FILE *f = fopen("data/bank_data/admin.cfg", "r");
     if(!f) {
         set_admin_password_hash("admin");
@@ -34,9 +31,17 @@ int main(int argc, char **argv) {
     
     int choice;
     do {
-        printf("\n=================================\n");
-        printf("    FlowCash - Bank Manager      \n");
-        printf("=================================\n");
+        clear_screen();
+        printf("\n===========================================\n");
+        printf("   _____ _               _____           _ \n");
+        printf("  |  ___| |             /  __ \\         | |\n");
+        printf("  | |_  | | _____      _| /  \\/ __ _ ___| |__ \n");
+        printf("  |  _| | |/ _ \\ \\ /\\ / / |    / _` / __| '_ \\ \n");
+        printf("  | |   | | (_) \\ V  V /| \\__/\\ (_| \\__ \\ | | |\n");
+        printf("  \\_|   |_|\\___/ \\_/\\_/  \\____/\\__,_|___/_| |_|\n");
+        printf("===========================================\n");
+        printf("          Bank Management System           \n");
+        printf("===========================================\n");
         printf("1) User Panel\n");
         printf("2) Admin Panel\n");
         printf("0) Exit\n");

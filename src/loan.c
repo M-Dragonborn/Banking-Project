@@ -11,7 +11,6 @@ void request_loan(const Account *acc) {
         return;
     }
     
-    // Check if missed payments exist
     char loan_file[100];
     sprintf(loan_file, "data/bank_data/loans/%s.loan", acc->id);
     FILE *f = fopen(loan_file, "r");
@@ -35,14 +34,13 @@ void request_loan(const Account *acc) {
         return;
     }
     
-    rate = 0.05; // Fixed 5% for simplicity
+    rate = 0.05;
     
     if (!get_int("Enter repayment duration in months: ", &months) || !POSITIVE(months)) {
         printf("Invalid months.\n");
         return;
     }
     
-    // Add to pending loans
     FILE *pf = fopen("data/bank_data/pending_loans.txt", "a");
     if (pf) {
         fprintf(pf, "%s|%.2lf|%.3lf|%d\n", acc->id, amount, rate, months);
@@ -91,7 +89,6 @@ void pay_loan(Account *acc) {
     if (!get_int("Select loan to pay (or 0 to cancel, 9 to simulate a missed month): ", &choice)) return;
     
     if (choice == 9) {
-        // Simulate a missed month for demo purposes
         int l_idx;
         if(get_int("Which loan number to miss? ", &l_idx) && l_idx >= 1 && l_idx <= count) {
             loans[l_idx-1].missed = 1;
@@ -107,7 +104,7 @@ void pay_loan(Account *acc) {
             acc->balance -= installment;
             loans[idx].principal -= monthly_principal;
             loans[idx].paid_months++;
-            loans[idx].missed = 0; // Cleared missed status
+            loans[idx].missed = 0;
             
             write_account(acc);
             log_transaction(acc->id, "PAYMENT", installment, "Loan installment paid");
@@ -121,7 +118,6 @@ void pay_loan(Account *acc) {
         }
     }
     
-    // Save loans back
     f = fopen(loan_file, "w");
     if (f) {
         int remaining = 0;
@@ -133,7 +129,6 @@ void pay_loan(Account *acc) {
         }
         fclose(f);
         
-        // Update account loan count if a loan was paid off
         if (remaining < acc->loan_count) {
             acc->loan_count = remaining;
             write_account(acc);
@@ -181,7 +176,7 @@ void approve_deny_loans(void) {
         return;
     }
     
-    FILE *f_new = fopen("data/bank_data/pending_loans.txt", "w"); // rewrite unresolved
+    FILE *f_new = fopen("data/bank_data/pending_loans.txt", "w");
     for (int i = 0; i < count; i++) {
         char id[10];
         double amount, rate;
@@ -203,7 +198,7 @@ void approve_deny_loans(void) {
                 Account acc;
                 if (read_account(id, &acc)) {
                     acc.loan_count++;
-                    acc.balance += amount; // funds deposited
+                    acc.balance += amount;
                     write_account(&acc);
                     log_transaction(id, "LOAN", amount, "Loan approved and deposited");
                 }
