@@ -1,14 +1,15 @@
 #include "../include/flowcash.h"
 
+// this is a test script that runs automatically to show how everything works without typing
 void run_demo(void) {
     printf("=== RUNNING DEMO SCENARIO ===\n\n");
     
-    remove("data/bank_data/index.idx");
-    remove("data/bank_data/user.log");
-    remove("data/bank_data/admin.log");
+    remove("data/bank_data/index.txt");
+    remove("data/bank_data/user.txt");
+    remove("data/bank_data/admin.txt");
     set_system_loan_status(1);
     
-    FILE *f = fopen("data/bank_data/system.cfg", "w");
+    FILE *f = fopen("data/bank_data/system.txt", "w");
     if(f) {
         fprintf(f, "9999999\n1\n");
         fclose(f);
@@ -45,7 +46,7 @@ void run_demo(void) {
     add_to_index(acc3.id);
     
     char loan_file3[100];
-    sprintf(loan_file3, "data/bank_data/loans/%s.loan", acc3.id);
+    sprintf(loan_file3, "data/bank_data/loans/%s.txt", acc3.id);
     FILE *lf3 = fopen(loan_file3, "w");
     if(lf3) {
         fprintf(lf3, "1000.00 0.050 12 5 0\n");
@@ -63,7 +64,7 @@ void run_demo(void) {
     add_to_index(acc4.id);
 
     char loan_file4[100];
-    sprintf(loan_file4, "data/bank_data/loans/%s.loan", acc4.id);
+    sprintf(loan_file4, "data/bank_data/loans/%s.txt", acc4.id);
     FILE *lf4 = fopen(loan_file4, "w");
     if(lf4) {
         fprintf(lf4, "2000.00 0.050 24 10 1\n");
@@ -95,16 +96,16 @@ void run_demo(void) {
     printf("   %s: BDT %.2lf\n", acc2.name, acc2.balance);
     
     printf("\n5. Log Files:\n");
-    printf("--- user.log ---\n");
-    f = fopen("data/bank_data/user.log", "r");
+    printf("--- user.txt ---\n");
+    f = fopen("data/bank_data/user.txt", "r");
     if(f) {
         char line[200];
         while(fgets(line, sizeof(line), f)) printf("%s", line);
         fclose(f);
     }
     
-    printf("--- admin.log ---\n");
-    f = fopen("data/bank_data/admin.log", "r");
+    printf("--- admin.txt ---\n");
+    f = fopen("data/bank_data/admin.txt", "r");
     if(f) {
         char line[200];
         while(fgets(line, sizeof(line), f)) printf("%s", line);

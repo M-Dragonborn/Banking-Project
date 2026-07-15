@@ -3,6 +3,7 @@
 static Account current_user;
 static int is_logged_in = 0;
 
+// creates a new bank account and saves it to a text file
 void create_account(void) {
     Account new_acc;
     memset(&new_acc, 0, sizeof(Account));
@@ -44,6 +45,7 @@ void create_account(void) {
     }
 }
 
+// logs the user in by checking their id and pin from the database
 void login_user(void) {
     if (is_logged_in) {
         printf("Already logged in as %s.\n", current_user.id);
@@ -70,6 +72,7 @@ void login_user(void) {
     printf("Invalid ID or PIN.\n");
 }
 
+// adds money to the users balance and saves it
 static void user_deposit(void) {
     double amount;
     if (!get_double("Enter deposit amount: BDT ", &amount) || !POSITIVE(amount) || !AMOUNT_RANGE(amount)) {
@@ -87,6 +90,7 @@ static void user_deposit(void) {
     }
 }
 
+// takes money out if they have enough balance
 static void user_withdraw(void) {
     double amount;
     if (!get_double("Enter withdrawal amount: BDT ", &amount) || !POSITIVE(amount) || !AMOUNT_RANGE(amount)) {
@@ -109,6 +113,7 @@ static void user_withdraw(void) {
     }
 }
 
+// sends money from the logged in user to another account
 static void user_transfer(void) {
     char target_id[10];
     if (!get_string("Enter recipient Account ID: ", target_id, sizeof(target_id))) return;
@@ -149,6 +154,7 @@ static void user_transfer(void) {
     }
 }
 
+// lets the user change their 4 digit pin
 static void change_pin(void) {
     char pin[10];
     if (!get_string("Enter new 4-digit PIN: ", pin, sizeof(pin)) || !PIN_LEN(pin)) {
@@ -165,6 +171,7 @@ static void change_pin(void) {
     }
 }
 
+// the main menu loop for normal users where they pick what to do
 void user_menu(void) {
     int choice;
     do {

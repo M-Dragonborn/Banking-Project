@@ -1,5 +1,6 @@
 #include "../include/flowcash.h"
 
+// lets the user ask for a new loan if they are eligible
 void request_loan(const Account *acc) {
     if (!acc->loan_enabled || !get_system_loan_status()) {
         printf("Loans are currently disabled for this account or system-wide.\n");
@@ -12,7 +13,7 @@ void request_loan(const Account *acc) {
     }
     
     char loan_file[100];
-    sprintf(loan_file, "data/bank_data/loans/%s.loan", acc->id);
+    sprintf(loan_file, "data/bank_data/loans/%s.txt", acc->id);
     FILE *f = fopen(loan_file, "r");
     if (f) {
         Loan l;
@@ -54,9 +55,10 @@ void request_loan(const Account *acc) {
     }
 }
 
+// calculates monthly payments and lets the user pay off their active loans
 void pay_loan(Account *acc) {
     char loan_file[100];
-    sprintf(loan_file, "data/bank_data/loans/%s.loan", acc->id);
+    sprintf(loan_file, "data/bank_data/loans/%s.txt", acc->id);
     FILE *f = fopen(loan_file, "r");
     if (!f) {
         printf("No active loans found.\n");
@@ -65,8 +67,16 @@ void pay_loan(Account *acc) {
     
     Loan loans[2];
     int count = 0;
-    while (count < 2 && fscanf(f, "%lf %lf %d %d %d", &loans[count].principal, &loans[count].rate, &loans[count].months, &loans[count].paid_months, &loans[count].missed) == 5) {
-        count++;
+    while (1) {
+        if (count >= 2) {
+            break;
+        }
+        int read_vars = fscanf(f, "%lf %lf %d %d %d", &loans[count].principal, &loans[count].rate, &loans[count].months, &loans[count].paid_months, &loans[count].missed);
+        if (read_vars == 5) {
+            count++;
+        } else {
+            break;
+        }
     }
     fclose(f);
     
@@ -81,8 +91,15 @@ void pay_loan(Account *acc) {
         double monthly_principal = loans[i].principal / (loans[i].months - loans[i].paid_months);
         double installment = monthly_principal + monthly_interest;
         
+        char missed_str[20];
+        if (loans[i].missed) {
+            strcpy(missed_str, "(MISSED)");
+        } else {
+            strcpy(missed_str, "");
+        }
+        
         printf("%d) Remaining Principal: BDT %.2lf, Paid: %d/%d months. Next Installment: BDT %.2lf %s\n", 
-               i+1, loans[i].principal, loans[i].paid_months, loans[i].months, installment, loans[i].missed ? "(MISSED)" : "");
+               i+1, loans[i].principal, loans[i].paid_months, loans[i].months, installment, missed_str);
     }
     
     int choice;
@@ -137,9 +154,10 @@ void pay_loan(Account *acc) {
     }
 }
 
+// shows the user all their current loans and if they missed any payments
 void view_loan_status(const Account *acc) {
     char loan_file[100];
-    sprintf(loan_file, "data/bank_data/loans/%s.loan", acc->id);
+    sprintf(loan_file, "data/bank_data/loans/%s.txt", acc->id);
     FILE *f = fopen(loan_file, "r");
     if (!f) {
         printf("No active loans.\n");
@@ -150,12 +168,20 @@ void view_loan_status(const Account *acc) {
     int count = 1;
     printf("\n--- Loan Status ---\n");
     while (fscanf(f, "%lf %lf %d %d %d", &l.principal, &l.rate, &l.months, &l.paid_months, &l.missed) == 5) {
+        char status_str[20];
+        if (l.missed) {
+            strcpy(status_str, "MISSED PAYMENT");
+        } else {
+            strcpy(status_str, "OK");
+        }
         printf("Loan %d: Principal BDT %.2lf, Rate %.1f%%, Paid %d/%d months. Status: %s\n",
-               count++, l.principal, l.rate * 100.0, l.paid_months, l.months, l.missed ? "MISSED PAYMENT" : "OK");
+               count, l.principal, l.rate * 100.0, l.paid_months, l.months, status_str);
+        count++;
     }
     fclose(f);
 }
 
+// admin menu to look at all pending loans and say yes or no
 void approve_deny_loans(void) {
     FILE *f = fopen("data/bank_data/pending_loans.txt", "r");
     if (!f) {
@@ -179,8 +205,9 @@ void approve_deny_loans(void) {
     FILE *f_new = fopen("data/bank_data/pending_loans.txt", "w");
     for (int i = 0; i < count; i++) {
         char id[10];
-        double amount, rate;
-        int months;
+        double amount = 0, rate = 0;
+        int months = 0;
+        
         sscanf(lines[i], "%[^|]|%lf|%lf|%d", id, &amount, &rate, &months);
         
         printf("\nPending request from Account %s for BDT %.2lf (%d months).\n", id, amount, months);
@@ -188,7 +215,7 @@ void approve_deny_loans(void) {
         if (get_string("Approve? (y/n/s to skip): ", choice, sizeof(choice))) {
             if (tolower(choice[0]) == 'y') {
                 char loan_file[100];
-                sprintf(loan_file, "data/bank_data/loans/%s.loan", id);
+                sprintf(loan_file, "data/bank_data/loans/%s.txt", id);
                 FILE *lf = fopen(loan_file, "a");
                 if (lf) {
                     fprintf(lf, "%.2lf %.3lf %d 0 0\n", amount, rate, months);

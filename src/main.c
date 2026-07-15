@@ -1,16 +1,17 @@
 #include "../include/flowcash.h"
 
+// this function creates the config files if they dont exist yet so the program doesnt crash on first run
 static void init_directories(void) {
-    FILE *f = fopen("data/bank_data/admin.cfg", "r");
+    FILE *f = fopen("data/bank_data/admin.txt", "r");
     if(!f) {
         set_admin_password_hash("admin");
     } else {
         fclose(f);
     }
     
-    f = fopen("data/bank_data/system.cfg", "r");
+    f = fopen("data/bank_data/system.txt", "r");
     if(!f) {
-        f = fopen("data/bank_data/system.cfg", "w");
+        f = fopen("data/bank_data/system.txt", "w");
         if(f) {
             fprintf(f, "9999999\n1\n");
             fclose(f);
@@ -20,6 +21,7 @@ static void init_directories(void) {
     }
 }
 
+// the main entry point where the program actually starts running
 int main(int argc, char **argv) {
     if (argc > 1 && strcmp(argv[1], "--demo") == 0) {
         init_directories();

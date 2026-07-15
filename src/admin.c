@@ -2,8 +2,9 @@
 
 static int admin_logged_in = 0;
 
+// prints all accounts and lets admin edit or delete them
 static void list_and_manage_accounts(void) {
-    FILE *idx = fopen("data/bank_data/index.idx", "r");
+    FILE *idx = fopen("data/bank_data/index.txt", "r");
     if (!idx) {
         printf("No accounts found.\n");
         return;
@@ -53,8 +54,14 @@ static void list_and_manage_accounts(void) {
         if (!get_int("Select option: ", &sub_choice)) continue;
         
         if (sub_choice == 1) {
+            char loan_eligible_str[10];
+            if (acc.loan_enabled) {
+                strcpy(loan_eligible_str, "Yes");
+            } else {
+                strcpy(loan_eligible_str, "No");
+            }
             printf("\nID: %s\nName: %s\nBalance: BDT %.2lf\nLoans: %d\nLoan Eligible: %s\n",
-                   acc.id, acc.name, acc.balance, acc.loan_count, acc.loan_enabled ? "Yes" : "No");
+                   acc.id, acc.name, acc.balance, acc.loan_count, loan_eligible_str);
         } else if (sub_choice == 2) {
             if (ask_confirm("Are you sure you want to delete this account?")) {
                 delete_account_files(acc.id);
@@ -95,7 +102,13 @@ static void list_and_manage_accounts(void) {
             if (ask_confirm("Toggle loan eligibility?")) {
                 acc.loan_enabled = !acc.loan_enabled;
                 write_account(&acc);
-                printf("Loan eligibility set to: %s\n", acc.loan_enabled ? "Yes" : "No");
+                char loan_elig_msg[10];
+                if (acc.loan_enabled) {
+                    strcpy(loan_elig_msg, "Yes");
+                } else {
+                    strcpy(loan_elig_msg, "No");
+                }
+                printf("Loan eligibility set to: %s\n", loan_elig_msg);
                 char msg[100];
                 sprintf(msg, "Admin: toggled loan eligibility for %s", acc.id);
                 log_admin(msg);
@@ -108,11 +121,12 @@ static void list_and_manage_accounts(void) {
     } while (1);
 }
 
+// searches for a specific account by name or id
 static void search_accounts(void) {
     char query[50];
     if (!get_string("Enter ID or name to search: ", query, sizeof(query))) return;
     
-    FILE *idx = fopen("data/bank_data/index.idx", "r");
+    FILE *idx = fopen("data/bank_data/index.txt", "r");
     if (!idx) return;
     char id[20], path[100];
     int found = 0;
@@ -129,8 +143,9 @@ static void search_accounts(void) {
     if (!found) printf("No matching accounts found.\n");
 }
 
+// calculates total money and loans in the whole bank
 static void view_statistics(void) {
-    FILE *idx = fopen("data/bank_data/index.idx", "r");
+    FILE *idx = fopen("data/bank_data/index.txt", "r");
     if (!idx) return;
     char id[20], path[100];
     int total_accs = 0;
@@ -147,7 +162,7 @@ static void view_statistics(void) {
             
             if (acc.loan_count > 0) {
                 char loan_file[100];
-                sprintf(loan_file, "data/bank_data/loans/%s.loan", id);
+                sprintf(loan_file, "data/bank_data/loans/%s.txt", id);
                 FILE *lf = fopen(loan_file, "r");
                 if (lf) {
                     Loan l;
@@ -166,9 +181,16 @@ static void view_statistics(void) {
     printf("Global Bank Balance: BDT %.2lf\n", global_balance);
     printf("Total Loans Active: %d\n", total_loans);
     printf("Outstanding Loan Value: BDT %.2lf\n", outstanding_loan_value);
-    printf("Global Loan Feature: %s\n", get_system_loan_status() ? "ENABLED" : "DISABLED");
+    char global_loan_str[20];
+    if (get_system_loan_status()) {
+        strcpy(global_loan_str, "ENABLED");
+    } else {
+        strcpy(global_loan_str, "DISABLED");
+    }
+    printf("Global Loan Feature: %s\n", global_loan_str);
 }
 
+// lets the admin change the master password
 static void change_admin_password(void) {
     char new_pwd[50];
     if (get_string("Enter new admin password: ", new_pwd, sizeof(new_pwd))) {
@@ -184,6 +206,7 @@ static void change_admin_password(void) {
     }
 }
 
+// the main menu for admins to login and pick options
 void admin_menu(void) {
     int choice;
     do {
@@ -231,7 +254,13 @@ void admin_menu(void) {
             case 3: list_and_manage_accounts(); break;
             case 4: {
                 int st = get_system_loan_status();
-                printf("Current status: %s\n", st ? "Enabled" : "Disabled");
+                char status_str[20];
+                if (st) {
+                    strcpy(status_str, "Enabled");
+                } else {
+                    strcpy(status_str, "Disabled");
+                }
+                printf("Current status: %s\n", status_str);
                 if (ask_confirm("Toggle global loan feature?")) {
                     set_system_loan_status(!st);
                     printf("Feature toggled.\n");

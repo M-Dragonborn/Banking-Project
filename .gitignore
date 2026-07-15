@@ -1,0 +1,9 @@
+# Ignore all data files generated at runtime
+data/
+
+# Ignore compiled executable files
+*.exe
+flowcash
+
+# Ignore object files (if compiled with gcc -c)
+*.o
