@@ -2,11 +2,21 @@
 
 A lightweight, terminal-only banking demonstration tool written entirely in plain C (C99/C11 standard). FlowCash was developed as an academic project to replace slow, error-prone paper ledgers without the heavy overhead of full database servers (like MySQL or PostgreSQL).
 
-## Quick start
+## Quick Start
+
+### Option A: Run directly from Web (No download required)
 ```sh
 curl -sL https://raw.githubusercontent.com/M-Dragonborn/Banking-Project/main/run.sh | bash
 ```
-*The script fetches the source, compiles it with GCC, and runs the program.*
+*Fetches source files, compiles with GCC, and runs FlowCash automatically.*
+
+### Option B: One-Click Local Setup (After Downloading / Cloning)
+If you have already downloaded or cloned the project repository locally:
+
+- **Windows:** Double-click `run.bat` (or execute `.\run.bat` in Command Prompt / PowerShell).
+- **Linux / macOS / Git Bash:** Run `./run.sh` in your terminal.
+
+*The local script creates necessary data directories, compiles your local C files with GCC, and launches FlowCash.*
 
 ## Why FlowCash? (Needs & Goals)
 Traditional banking systems are often monolithic, requiring dedicated administration, costly proprietary licensing, and months of setup. FlowCash aims to provide a completely self-contained, lightweight alternative:
