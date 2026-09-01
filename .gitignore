@@ -7,3 +7,8 @@ flowcash
 
 # Ignore object files (if compiled with gcc -c)
 *.o
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+config.bat
+node_modules
